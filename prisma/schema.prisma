@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("VITE_DATABASE_URL")
+}
+
+type Password {
+  hash String
+}
+
+type Profile {
+  firstName String
+  lastName  String
+}
+
+enum AccountType {
+  Personnel
+  Joint
+  Externe
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String   @unique
+  password  Password
+  active    Boolean @default(false)
+  admin     Boolean @default(false)
+  profile   Profile
+}
+
+model Owner {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  description String
+  Account     Account? @relation(fields: [accountId], references: [id])
+  accountId   String?  @db.ObjectId
+}
+
+model Account {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  IBAN            String        @unique
+  owners          Owner[]
+  type            AccountType
+  TransactionFrom Transaction[] @relation(name: "fromAccount")
+  TransactionTo   Transaction[] @relation(name: "toAccount")
+  Transaction     Transaction[]
+}
+
+model Transaction {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  amount        Float
+  date          DateTime
+  fromAccount   Account? @relation(fields: [fromAccountId], references: [id], name: "fromAccount")
+  fromAccountId String?  @db.ObjectId
+  toAccount     Account? @relation(fields: [toAccountId], references: [id], name: "toAccount")
+  toAccountId   String?  @db.ObjectId
+  category      Category @relation(fields: [categoryId], references: [id])
+  categoryId    String   @db.ObjectId
+  Account       Account? @relation(fields: [accountId], references: [id])
+  accountId     String?  @db.ObjectId
+}
+
+model Category {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  label       String        @unique
+  Transaction Transaction[]
+}
