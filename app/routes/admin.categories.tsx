@@ -1,21 +1,22 @@
 import { LoaderFunction, json } from '@remix-run/node'
-import { useLoaderData, useMatches } from '@remix-run/react'
+import { Outlet, useLoaderData, useMatches } from '@remix-run/react'
 import { Item } from '~/components/AdminPanel'
 import type { TableProps } from '~/components/Table'
 import Table from '~/components/Table'
-import { getAllCategories } from '~/data/category'
+import AddButton from '~/components/buttons/AddButton'
+import { categoryVariables, getAllCategories } from '~/data/category'
+import { requireUserId } from '~/utils/auth.server'
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({ request }) => {
+    await requireUserId(request)
     const categories = await getAllCategories()
     if (!categories || categories.length === 0) {
-        throw json({ message: '' }, { status: 400 })
+        throw json({ message: `Aucune catégorie n'a pu être trouvée!` }, { status: 404 })
     }
     const tableData: TableProps = {
-        columns: [
-            { id: 'id', label: 'id', type: 'id' },
-            { id: 'label', label: 'Description', type: 'string' },
-        ],
+        columns: categoryVariables,
         rows: categories.map((category) => [category.id, category.label]),
+        path: '/admin/categories',
     }
     return json({ tableData })
 }
@@ -31,13 +32,23 @@ const AdminCategories = () => {
         currentSection = items.find((el) => el.to === pathname)!
     }
     return (
-        <div className='flex flex-col w-5/6'>
-            <h1 className='text-3xl m-4 ml-20'>{currentSection.label}</h1>
-            <Table
-                columns={tableData.columns}
-                rows={tableData.rows}
-            />
-        </div>
+        <>
+            <Outlet />
+            {currentSection.label && (
+                <div className='flex flex-col w-5/6'>
+                    <h1 className='text-3xl m-4 ml-20'>
+                        {currentSection.label}
+                        <AddButton to={`${tableData.path}/new`} />
+                    </h1>
+
+                    <Table
+                        columns={tableData.columns}
+                        rows={tableData.rows}
+                        path={tableData.path}
+                    />
+                </div>
+            )}
+        </>
     )
 }
 

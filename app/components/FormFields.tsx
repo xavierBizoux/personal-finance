@@ -1,23 +1,24 @@
 import { useEffect, useState } from 'react'
 
-interface FormFieldProps {
+type FormFieldProps = {
     htmlFor: string
     label: string
     type?: string
     required?: boolean
-    value?: string | number
+    readOnly?: boolean
+    value?: string | number | boolean
     error?: string
 }
 
 export const PasswordField = ({ htmlFor, label, required = false, value, error }: FormFieldProps) => {
     const [isVisible, setIsVisible] = useState(false)
-    const [type, setType] = useState("password")
+    const [type, setType] = useState('password')
     const handleClick = () => {
         setIsVisible(!isVisible)
     }
     useEffect(() => {
-        isVisible ? setType("text") : setType("password")
-    },[isVisible])
+        isVisible ? setType('text') : setType('password')
+    }, [isVisible])
     return (
         <>
             <label
@@ -76,7 +77,24 @@ export const PasswordField = ({ htmlFor, label, required = false, value, error }
     )
 }
 
-export const TextField = ({ htmlFor, label, type = 'text', required = false, value, error }: FormFieldProps) => {
+export const TextField = ({
+    htmlFor,
+    label,
+    type = 'text',
+    required = false,
+    readOnly = false,
+    value,
+    error,
+}: FormFieldProps) => {
+    const inputProps = {
+        type: type,
+        id: htmlFor,
+        name: htmlFor,
+        required: required,
+        className: ' w-full p-2 rounded-xl my-2  border-gray-200 border-2',
+        readOnly: readOnly,
+        defaultValue: value,
+    } as React.InputHTMLAttributes<HTMLInputElement>
     return (
         <>
             <label
@@ -85,16 +103,38 @@ export const TextField = ({ htmlFor, label, type = 'text', required = false, val
                 {label}
             </label>
             <div className='w-full flex'>
-                <input
-                    type={type}
-                    id={htmlFor}
-                    name={htmlFor}
-                    required={required}
-                    className=' w-full p-2 rounded-xl my-2'
-                    value={value}
-                />
+                <input {...inputProps} />
             </div>
             {error || <p className='text-red-400'>{error}</p>}
         </>
+    )
+}
+
+export const BooleanField = ({ htmlFor, label, type = 'checkbox', readOnly = false, value }: FormFieldProps) => {
+    const [checked, setChecked] = useState<boolean>(value as boolean)
+    const handleCheck = (checked: boolean) => {
+        setChecked(!checked)
+    }
+    const inputProps = {
+        type: type,
+        id: htmlFor,
+        name: htmlFor,
+        className: ' w-full p-2 my-2 ',
+        readOnly: readOnly,
+        defaultChecked: value,
+    } as React.InputHTMLAttributes<HTMLInputElement>
+    return (
+        <div className='flex flex-row'>
+            <label
+                htmlFor={htmlFor}
+                className='text-slate-500 w-2 font-semibold'>
+                {label}
+            </label>
+            <input
+                {...inputProps}
+                defaultChecked={checked}
+                onClick={() => handleCheck(checked)}
+            />
+        </div>
     )
 }

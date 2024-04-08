@@ -1,4 +1,4 @@
-interface CheckIconProps {
+type CheckIconProps  = {
     className?: string
 }
 const CheckIcon = ({ className }: CheckIconProps) => {

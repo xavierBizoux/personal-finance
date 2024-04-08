@@ -1,4 +1,4 @@
-interface BudgetIconProps {
+type BudgetIconProps = {
     className?: string
 }
 const BudgetIcon = ({ className }: BudgetIconProps) => {

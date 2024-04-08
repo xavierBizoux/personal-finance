@@ -1,7 +1,7 @@
-type CheckIconProps = {
+type AddIconProps = {
     className?: string
 }
-const UncheckIcon = ({ className }: CheckIconProps) => {
+const AddIcon = ({ className }: AddIconProps) => {
     return (
         <svg
             xmlns='http://www.w3.org/2000/svg'
@@ -9,14 +9,14 @@ const UncheckIcon = ({ className }: CheckIconProps) => {
             viewBox='0 0 24 24'
             strokeWidth={1.5}
             stroke='currentColor'
-            className={className + ' max-w-6'}>
+            className={className}>
             <path
                 strokeLinecap='round'
                 strokeLinejoin='round'
-                d='m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
+                d='M12 4.5v15m7.5-7.5h-15'
             />
         </svg>
     )
 }
 
-export default UncheckIcon
+export default AddIcon
